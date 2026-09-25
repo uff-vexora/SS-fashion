@@ -6,6 +6,7 @@ import Rating from '../components/common/Rating';
 import ProductGrid from '../components/product/ProductGrid';
 import { formatPrice } from '../utils/formatPrice';
 import { calculateDiscount } from '../utils/calculateDiscount';
+import AiFitPredictor from '../components/product/AiFitPredictor';
 
 const SAMPLE_REVIEWS = [
   { name: 'Priya S.', rating: 5, title: 'Perfect fit, beautiful quality', body: 'Exactly as described. The fabric feels premium and the fit is true to size. Very happy with this purchase.', verified: true, date: '14 Sep 2026' },
@@ -32,6 +33,7 @@ export default function ProductDetails() {
   const [pin, setPin] = useState('');
   const [pinResult, setPinResult] = useState('');
   const [showSizeGuide, setShowSizeGuide] = useState(false);
+  const [showAiFit, setShowAiFit] = useState(false);
   const [added, setAdded] = useState(false);
 
   if (!product) {
@@ -126,12 +128,22 @@ export default function ProductDetails() {
           {/* Size choice */}
           <div className="choice">
             <b>Size</b>
-            <button
-              style={{ position: 'absolute', right: 0, top: 0, background: 'none', border: 0, fontSize: 11, textDecoration: 'underline', cursor: 'pointer', color: 'var(--accent)', textUnderlineOffset: 3 }}
-              onClick={() => setShowSizeGuide(true)}
-            >
-              Size guide
-            </button>
+            <div style={{ position: 'absolute', right: 0, top: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <button
+                type="button"
+                className="ai-badge luminous"
+                style={{ cursor: 'pointer', padding: '3px 9px', fontSize: 10, border: '1px solid rgba(139, 92, 246, 0.4)' }}
+                onClick={() => setShowAiFit(true)}
+              >
+                <span className="dot" /> ✦ AI Fit Advisor
+              </button>
+              <button
+                style={{ background: 'none', border: 0, fontSize: 11, textDecoration: 'underline', cursor: 'pointer', color: 'var(--accent)', textUnderlineOffset: 3 }}
+                onClick={() => setShowSizeGuide(true)}
+              >
+                Size guide
+              </button>
+            </div>
             <div className="sizes">
               {product.sizes.map((item) => (
                 <button
@@ -276,6 +288,14 @@ export default function ProductDetails() {
           </div>
         </div>
       )}
+      {/* AI Fit Predictor Modal */}
+      <AiFitPredictor
+        product={product}
+        selectedSize={size}
+        onSelectSize={setSize}
+        isOpen={showAiFit}
+        onClose={() => setShowAiFit(false)}
+      />
     </main>
   );
 }

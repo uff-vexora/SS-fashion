@@ -1,0 +1,16 @@
+{
+  "name": "SS Fashion° — Modern Essentials",
+  "short_name": "SS Fashion",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f7f3",
+  "theme_color": "#18181a",
+  "description": "Considered fashion pieces designed in India.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

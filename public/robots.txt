@@ -5,4 +5,4 @@ Disallow: /cart
 Disallow: /checkout
 Disallow: /wishlist
 
-Sitemap: https://atelier.in/sitemap.xml
+Sitemap: https://ss-fashion.in/sitemap.xml

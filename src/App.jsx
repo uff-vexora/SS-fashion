@@ -4,6 +4,7 @@ import { StoreProvider } from './context/StoreContext';
 import AppRoutes from './routes/AppRoutes';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import ScrollToTop from './components/common/ScrollToTop';
+import AiStylistFab from './components/common/AiStylistFab';
 
 export default function App() {
   return (
@@ -13,7 +14,9 @@ export default function App() {
         <Header />
         <AppRoutes />
         <Footer />
+        <AiStylistFab />
       </StoreProvider>
     </ErrorBoundary>
   );
 }
+

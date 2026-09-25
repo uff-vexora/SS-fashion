@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import ProductGrid from '../components/product/ProductGrid';
 import { products } from '../data/products';
+import AiStylistModal from '../components/common/AiStylistModal';
+import { formatPrice } from '../utils/formatPrice';
 
 const categories = [
   ['Men',      'https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=900&q=85', 'Modern tailoring'],
@@ -20,6 +23,8 @@ const structuredData = {
 };
 
 export default function Home() {
+  const [stylistOpen, setStylistOpen] = useState(false);
+
   return (
     <>
       {/* JSON-LD structured data */}
@@ -29,7 +34,8 @@ export default function Home() {
       />
 
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="hero" aria-label="Hero — Autumn collection">
+      <section className="hero ai-ambient-bg" aria-label="Hero — Autumn collection">
+        <div className="ai-orb ai-orb-1" aria-hidden="true" />
         <img
           src="https://images.unsplash.com/photo-1496217590455-aa63a8350eea?auto=format&fit=crop&w=1800&q=90"
           alt="SS Fashion Autumn editorial — women's collection"
@@ -37,21 +43,127 @@ export default function Home() {
           loading="eager"
         />
         <div className="hero-copy">
-          <p>THE AUTUMN EDIT · 2026</p>
+          <div style={{ marginBottom: 12 }}>
+            <span className="ai-badge luminous" style={{ background: 'rgba(24,24,26,0.7)', color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }}>
+              <span className="dot" /> AI STYLED EDIT · AUTUMN 2026
+            </span>
+          </div>
           <h1>
             New forms.<br />
             Same point of view.
           </h1>
-          <span>Considered pieces for the season ahead.</span>
+          <span>Considered pieces designed for fluid everyday luxury.</span>
           <div className="hero-actions">
             <Link className="button light" to="/new">Shop new arrivals</Link>
-            <Link className="text-link" to="/women">Explore collection →</Link>
+            <button
+              type="button"
+              className="ai-button-glow"
+              onClick={() => setStylistOpen(true)}
+              style={{ padding: '12px 22px' }}
+            >
+              ✦ Ask AI Stylist
+            </button>
           </div>
         </div>
 
         {/* Scroll hint */}
         <div className="hero-scroll" aria-hidden="true">
           ↓ SCROLL
+        </div>
+      </section>
+
+      {/* ── AI Neural Styling Studio Showcase Banner ─────── */}
+      <section className="section ai-ambient-bg" style={{ padding: '60px var(--section-h)' }}>
+        <div className="ai-orb ai-orb-2" aria-hidden="true" />
+        <div className="ai-glass-card ai-border-glow" style={{ padding: '40px 36px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 24, marginBottom: 28 }}>
+            <div>
+              <span className="ai-badge luminous" style={{ marginBottom: 10 }}>
+                <span className="dot" /> ATELIER INTELLIGENCE V3.8
+              </span>
+              <h2 className="ai-gradient-text" style={{ fontSize: 32, fontFamily: 'var(--serif)', fontWeight: 600, margin: '6px 0 10px' }}>
+                Generative Styling Studio
+              </h2>
+              <p style={{ color: 'var(--muted)', fontSize: 14, maxWidth: 540, lineHeight: 1.6 }}>
+                Experience intelligent wardrobe curation. Our neural algorithm harmonizes color temperature, fabric drape, and silhouettes from the SS Fashion vault in real-time.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              className="ai-button-glow"
+              onClick={() => setStylistOpen(true)}
+              style={{ alignSelf: 'center' }}
+            >
+              Launch AI Stylist Concierge ✦
+            </button>
+          </div>
+
+          {/* 3 AI Highlight Feature Cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20 }}>
+            {[
+              {
+                title: 'Monsoon Quiet Luxury',
+                match: '98.8%',
+                item: products.find((p) => p.id === 'w1') || products[0],
+                sub: 'Linen Column + Tailored Layering',
+              },
+              {
+                title: 'Contemporary Executive',
+                match: '97.4%',
+                item: products.find((p) => p.id === 'm1') || products[1],
+                sub: 'Relaxed Oxford + Pleated Drape',
+              },
+              {
+                title: 'Tactile Weekend Minimalist',
+                match: '99.1%',
+                item: products.find((p) => p.id === 'w4') || products[2],
+                sub: 'Soft Blazer + Sculpted Rib Tank',
+              },
+            ].map((look, idx) => (
+              <div
+                key={idx}
+                onClick={() => setStylistOpen(true)}
+                style={{
+                  background: '#fff',
+                  borderRadius: 'var(--r-lg)',
+                  border: '1px solid var(--line-light)',
+                  padding: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 16,
+                  cursor: 'pointer',
+                  transition: 'all var(--t-spring)',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-3px)';
+                  e.currentTarget.style.boxShadow = '0 12px 28px rgba(142,72,55,0.12)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.04)';
+                }}
+              >
+                <img
+                  src={look.item.img}
+                  alt={look.title}
+                  style={{ width: 68, height: 78, borderRadius: 8, objectFit: 'cover' }}
+                />
+                <div>
+                  <span style={{ fontSize: 10, fontFamily: 'var(--mono)', color: 'var(--accent)', fontWeight: 700 }}>
+                    ✦ {look.match} HARMONY
+                  </span>
+                  <h4 style={{ fontSize: 14, fontWeight: 600, margin: '2px 0 4px', lineHeight: 1.3 }}>
+                    {look.title}
+                  </h4>
+                  <p style={{ fontSize: 11, color: 'var(--muted)', margin: 0 }}>
+                    {look.sub}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -108,14 +220,20 @@ export default function Home() {
           alt="A study in texture — SS Fashion womenswear campaign"
         />
         <div>
-          <p className="eyebrow">A STUDY IN TEXTURE</p>
-          <h2>
+          <span className="ai-badge luminous" style={{ marginBottom: 12 }}>
+            <span className="dot" /> EDITORIAL ATELIER
+          </span>
+          <h2 style={{ marginTop: 8 }}>
             Feel good<br />
             in your skin.
           </h2>
           <Link className="button" to="/women">Discover womenswear</Link>
         </div>
       </section>
+
+      {/* AI Stylist Modal */}
+      <AiStylistModal isOpen={stylistOpen} onClose={() => setStylistOpen(false)} />
     </>
   );
 }
+

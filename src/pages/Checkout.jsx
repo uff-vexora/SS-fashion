@@ -5,12 +5,43 @@ import CartSummary from '../components/cart/CartSummary';
 import EmptyState from '../components/common/EmptyState';
 
 export default function Checkout() {
-  const { cart, placeOrder } = useStore();
+  const { cart, placeOrder, user, notify } = useStore();
   const [placed, setPlaced] = useState(false);
   const [orderId, setOrderId] = useState('');
   const [delivery, setDelivery] = useState('standard');
   const [payment, setPayment] = useState('upi');
   const [loading, setLoading] = useState(false);
+
+  // Default address from user if available
+  const defaultAddr = user?.savedAddresses?.find((a) => a.isDefault) || user?.savedAddresses?.[0];
+  const [formData, setFormData] = useState({
+    name: user?.name || '',
+    phone: user?.phone || defaultAddr?.phone || '',
+    email: user?.email || '',
+    pincode: defaultAddr?.pincode || '',
+    address: defaultAddr?.address || '',
+    city: defaultAddr?.city || '',
+    state: defaultAddr?.state || '',
+  });
+
+  function autofillUser() {
+    if (!user) return;
+    setFormData({
+      name: user.name || '',
+      phone: user.phone || defaultAddr?.phone || '',
+      email: user.email || '',
+      pincode: defaultAddr?.pincode || '560038',
+      address: defaultAddr?.address || 'Flat 402, Signature Palms, Indiranagar',
+      city: defaultAddr?.city || 'Bengaluru',
+      state: defaultAddr?.state || 'Karnataka',
+    });
+    notify('Autofilled with Atelier Profile ✓');
+  }
+
+  function handleFieldChange(e) {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }
 
   if (!cart.length && !placed) {
     return (
@@ -26,14 +57,20 @@ export default function Checkout() {
 
   if (placed) {
     return (
-      <main className="page confirmation">
+      <main className="page confirmation ai-ambient-bg">
+        <div className="ai-orb ai-orb-1" aria-hidden="true" />
         <div className="empty-icon" aria-hidden="true">🎉</div>
         <p className="eyebrow">ORDER CONFIRMED</p>
-        <h1>Thank you for choosing SS Fashion.</h1>
+        <h1 className="ai-gradient-text">Thank you for choosing SS Fashion.</h1>
         <p>
           Order <strong>{orderId}</strong> is confirmed and being prepared with
           care. Check your email for details and tracking information.
         </p>
+        {user && (
+          <div className="ai-badge luminous" style={{ margin: '14px 0 24px', padding: '6px 14px' }}>
+            <span className="dot" /> ✦ Style Points added to your Atelier Membership
+          </div>
+        )}
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link className="button" to="/delivery">Track your order</Link>
           <Link className="button ghost" to="/new">Continue shopping</Link>
@@ -46,19 +83,8 @@ export default function Checkout() {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate network delay for UX polish
     setTimeout(() => {
-      const fd = new FormData(e.target);
-      const address = {
-        name:    fd.get('name'),
-        phone:   fd.get('phone'),
-        email:   fd.get('email'),
-        pincode: fd.get('pincode'),
-        address: fd.get('address'),
-        city:    fd.get('city'),
-        state:   fd.get('state'),
-      };
-      const order = placeOrder(cart, address);
+      const order = placeOrder(cart, formData);
       setOrderId(order.id);
       setLoading(false);
       setPlaced(true);
@@ -66,8 +92,48 @@ export default function Checkout() {
   }
 
   return (
-    <main className="page checkout">
+    <main className="page checkout ai-ambient-bg">
+      <div className="ai-orb ai-orb-1" aria-hidden="true" />
       <h1>Checkout</h1>
+
+      {/* Member status banner */}
+      <div style={{
+        background: user ? 'rgba(255,255,255,0.85)' : 'var(--paper)',
+        backdropFilter: 'blur(12px)',
+        border: '1px solid var(--line)',
+        borderRadius: 'var(--r-lg)',
+        padding: '14px 20px',
+        marginBottom: 28,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: 12,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span className="ai-badge luminous">
+            <span className="dot" /> {user ? user.tierBadge : 'ATELIER GUEST'}
+          </span>
+          <span style={{ fontSize: 13, color: 'var(--ink)' }}>
+            {user ? (
+              <>Authenticated as <strong>{user.name}</strong> · Profile details synced</>
+            ) : (
+              <>Have an Atelier account? <Link to="/login" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>Sign in</Link> for 1-click checkout.</>
+            )}
+          </span>
+        </div>
+
+        {user && (
+          <button
+            type="button"
+            onClick={autofillUser}
+            className="ai-badge"
+            style={{ cursor: 'pointer', background: '#fff' }}
+          >
+            ✦ Reset to Saved Address
+          </button>
+        )}
+      </div>
 
       <div className="checkout-grid">
         <form onSubmit={handleSubmit} noValidate>
@@ -75,13 +141,13 @@ export default function Checkout() {
           <section>
             <h2>Delivery address</h2>
             <div className="form-grid">
-              <input name="name"    required placeholder="Full name" autoComplete="name" />
-              <input name="phone"   required placeholder="Phone number" type="tel" inputMode="numeric" autoComplete="tel" />
-              <input name="email"   required placeholder="Email address" type="email" autoComplete="email" />
-              <input name="pincode" required placeholder="Pincode" maxLength={6} inputMode="numeric" />
-              <input name="address" required placeholder="Address line 1 & 2" className="full" autoComplete="street-address" />
-              <input name="city"    placeholder="City" autoComplete="address-level2" />
-              <input name="state"   placeholder="State" autoComplete="address-level1" />
+              <input name="name"    required placeholder="Full name" autoComplete="name" value={formData.name} onChange={handleFieldChange} />
+              <input name="phone"   required placeholder="Phone number" type="tel" inputMode="numeric" autoComplete="tel" value={formData.phone} onChange={handleFieldChange} />
+              <input name="email"   required placeholder="Email address" type="email" autoComplete="email" value={formData.email} onChange={handleFieldChange} />
+              <input name="pincode" required placeholder="Pincode" maxLength={6} inputMode="numeric" value={formData.pincode} onChange={handleFieldChange} />
+              <input name="address" required placeholder="Address line 1 & 2" className="full" autoComplete="street-address" value={formData.address} onChange={handleFieldChange} />
+              <input name="city"    placeholder="City" autoComplete="address-level2" value={formData.city} onChange={handleFieldChange} />
+              <input name="state"   placeholder="State" autoComplete="address-level1" value={formData.state} onChange={handleFieldChange} />
             </div>
           </section>
 

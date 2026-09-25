@@ -13,7 +13,7 @@ const NAV_LINKS = [
 ];
 
 export default function Header() {
-  const { cart, wish } = useStore();
+  const { cart, wish, user } = useStore();
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -162,6 +162,36 @@ export default function Header() {
               )}
             </Link>
 
+            {/* Account / Profile */}
+            <Link
+              className="nav-icon-btn profile-btn"
+              to="/account"
+              aria-label={user ? `Account (${user.name})` : "Sign In to Atelier"}
+              style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              {user ? (
+                <div style={{ position: 'relative', width: 26, height: 26 }}>
+                  <img
+                    src={user.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name)}`}
+                    alt={user.name}
+                    style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', border: '1.5px solid var(--accent)' }}
+                  />
+                  <span style={{
+                    position: 'absolute',
+                    bottom: -1,
+                    right: -1,
+                    width: 7,
+                    height: 7,
+                    borderRadius: '50%',
+                    background: '#10b981',
+                    border: '1.5px solid #fff'
+                  }} />
+                </div>
+              ) : (
+                <span style={{ fontSize: 16 }} title="Sign In">👤</span>
+              )}
+            </Link>
+
             {/* Cart bag */}
             <Link className="bag" to="/cart" aria-label={`Shopping bag (${cartCount} items)`}>
               🛍
@@ -285,6 +315,27 @@ export default function Header() {
               </button>
             </div>
 
+            {/* User profile card or sign in in drawer */}
+            <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--line-light)', background: 'rgba(255,255,255,0.6)' }}>
+              {user ? (
+                <Link to="/account" onClick={() => setMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <img
+                    src={user.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name)}`}
+                    alt={user.name}
+                    style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--accent)' }}
+                  />
+                  <div>
+                    <span style={{ display: 'block', fontWeight: 600, fontSize: 13.5 }}>{user.name}</span>
+                    <span style={{ fontSize: 11, color: 'var(--accent)', fontFamily: 'var(--mono)' }}>{user.tierBadge} · Account →</span>
+                  </div>
+                </Link>
+              ) : (
+                <Link to="/login" onClick={() => setMenuOpen(false)} className="ai-button-glow" style={{ width: '100%', fontSize: 11, padding: '10px 16px' }}>
+                  Sign In / Register ✦
+                </Link>
+              )}
+            </div>
+
             {/* Nav links */}
             <div style={{ padding: '16px 24px', flex: 1 }}>
               <p style={{ font: '300 9px var(--mono)', letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--muted)', margin: '0 0 12px' }}>Collections</p>
@@ -337,10 +388,9 @@ export default function Header() {
           <span className="icon">⌕</span>
           Search
         </Link>
-        <Link to="/wishlist" className={location.pathname === '/wishlist' ? 'active' : ''}>
-          <span className="icon">♡</span>
-          Saved
-          {wishCount > 0 && <b>{wishCount}</b>}
+        <Link to="/account" className={['/login', '/account'].includes(location.pathname) ? 'active' : ''}>
+          <span className="icon">👤</span>
+          {user ? 'Profile' : 'Sign In'}
         </Link>
         <Link to="/cart" className={location.pathname === '/cart' ? 'active' : ''}>
           <span className="icon">🛍</span>
